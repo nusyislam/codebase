@@ -42,6 +42,7 @@ W, H = 640, 360  # panel size (RGB ISP output after 1/3 scaling of 1080p)
 
 
 DEVICE_FILTERS = ("speckle", "temporal", "spatial")
+DEFAULT_FILTERS = ("spatial",)  # combined filters dropped depth to ~16-18 fps; spatial alone kept 30
 PP_RESOURCES = (3, 3)  # (shaves, memory slices) for on-device post-processing
 
 
@@ -64,7 +65,7 @@ def add_device_filter_args(ap):
     """Adds --filters / --pp-shaves / --pp-slices. Use device_filters_from_args after parsing."""
     ap.add_argument("--filters", type=parse_filters, metavar="LIST",
                     help="on-camera filters, comma-separated from speckle,temporal,spatial, or all/none "
-                         "(default: all, or none with --no-filter). Independent of the Pi-side tracking.")
+                         "(default: spatial, or none with --no-filter). Independent of the Pi-side tracking.")
     ap.add_argument("--pp-shaves", type=int, default=PP_RESOURCES[0],
                     help=f"shaves for on-camera post-processing (default {PP_RESOURCES[0]})")
     ap.add_argument("--pp-slices", type=int, default=PP_RESOURCES[1],
@@ -74,14 +75,14 @@ def add_device_filter_args(ap):
 def device_filters_from_args(args):
     if args.filters is not None:
         return args.filters
-    return () if getattr(args, "no_filter", False) else DEVICE_FILTERS
+    return () if getattr(args, "no_filter", False) else DEFAULT_FILTERS
 
 
 def describe_filters(filters):
     return ",".join(filters) if filters else "none"
 
 
-def build_pipeline(extended: bool, filters=DEVICE_FILTERS, pp_resources=PP_RESOURCES):
+def build_pipeline(extended: bool, filters=DEFAULT_FILTERS, pp_resources=PP_RESOURCES):
     """Returns (pipeline, cam_rgb).
 
     filters: which on-camera depth filters to enable, any of DEVICE_FILTERS

@@ -60,7 +60,8 @@ For one motor, it uses the nearest of all three:
 Change NEAR_M, FAR_M or MAX_RTP near the top of haptic_bridge_drv2605.py.
 
 Detection filtering (ObstacleTracker in depth_demo.py, ON by default):
-  - on-camera speckle/temporal/spatial depth filters
+  - on-camera spatial depth filter (add more with --filters, e.g. --filters all;
+    combining filters dropped depth to ~16-18 fps in testing)
   - an obstacle must be a connected blob (>= 300 px) seen in 3 of the last 5 frames
   - smoothing survives short dropouts; resets after 5 empty frames in a row
   - if something was < 0.5 m within the last 0.5 s and depth then goes
